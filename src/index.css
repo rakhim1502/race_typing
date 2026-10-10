@@ -1,0 +1,46 @@
+@import "tailwindcss";
+
+@layer base {
+  body {
+    @apply bg-[#080c14] text-slate-100 antialiased selection:bg-cyan-500/30 selection:text-cyan-200;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    min-height: 100vh;
+  }
+}
+
+/* Custom racing track and cyber textures */
+.track-grid {
+  background-image: linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+                    linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+  background-size: 32px 32px;
+}
+
+.checkered-pattern {
+  background-image: repeating-linear-gradient(45deg, #f8fafc 25%, transparent 25%, transparent 75%, #f8fafc 75%, #f8fafc),
+                    repeating-linear-gradient(45deg, #f8fafc 25%, #0f172a 25%, #0f172a 75%, #f8fafc 75%, #f8fafc);
+  background-position: 0 0, 8px 8px;
+  background-size: 16px 16px;
+}
+
+.neon-glow-cyan {
+  box-shadow: 0 0 25px -4px rgba(6, 182, 212, 0.45);
+}
+
+.neon-glow-purple {
+  box-shadow: 0 0 25px -4px rgba(168, 85, 247, 0.45);
+}
+
+.neon-border-cyan {
+  border-color: rgba(6, 182, 212, 0.6);
+  box-shadow: inset 0 0 15px rgba(6, 182, 212, 0.15), 0 0 15px rgba(6, 182, 212, 0.2);
+}
+
+/* Cursor pulse for typing engine */
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+.cursor-pulse {
+  animation: blink 1s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}

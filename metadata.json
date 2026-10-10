@@ -1,0 +1,6 @@
+{
+  "name": "TypeRacer Arena",
+  "description": "Real-time multiplayer typing racing arena with live car race visualizations, competitive rooms, and multi-language challenges.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

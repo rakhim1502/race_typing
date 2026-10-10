@@ -1,0 +1,135 @@
+// Prisma schema for TypeRacer Arena
+// PostgreSQL datasource and client generator
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Language {
+  UZ
+  EN
+  RU
+}
+
+enum Difficulty {
+  EASY
+  MEDIUM
+  HARD
+}
+
+enum RoomStatus {
+  WAITING
+  COUNTDOWN
+  RACING
+  FINISHED
+  CANCELLED
+}
+
+model User {
+  id           String      @id @default(uuid())
+  username     String      @unique
+  passwordHash String?
+  isGuest      Boolean     @default(false)
+  avatarUrl    String?
+  selectedCarId String     @default("car-cyan")
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+
+  stats        UserStats?
+  results      RaceResult[]
+  hostedRooms  RaceRoom[]  @relation("RoomHost")
+  participants RaceParticipant[]
+
+  @@index([username])
+}
+
+model UserStats {
+  id          String   @id @default(uuid())
+  userId      String   @unique
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  totalRaces  Int      @default(0)
+  totalWins   Int      @default(0)
+  avgWpm      Float    @default(0.0)
+  bestWpm     Float    @default(0.0)
+  avgAccuracy Float    @default(0.0)
+  xpPoints    Int      @default(0)
+  updatedAt   DateTime @updatedAt
+
+  @@index([totalWins(sort: Desc)])
+  @@index([bestWpm(sort: Desc)])
+}
+
+model TypingText {
+  id         String     @id @default(uuid())
+  title      String
+  content    String     @db.Text
+  language   Language   @default(UZ)
+  difficulty Difficulty @default(MEDIUM)
+  charCount  Int
+  author     String?
+  createdAt  DateTime   @default(now())
+
+  rooms      RaceRoom[]
+
+  @@index([language, difficulty])
+}
+
+model RaceRoom {
+  id          String            @id @default(uuid())
+  code        String            @unique
+  name        String
+  isPrivate   Boolean           @default(false)
+  status      RoomStatus        @default(WAITING)
+  hostUserId  String
+  host        User              @relation("RoomHost", fields: [hostUserId], references: [id])
+  textId      String
+  text        TypingText        @relation(fields: [textId], references: [id])
+  maxPlayers  Int               @default(5)
+  minPlayers  Int               @default(2)
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+
+  participants RaceParticipant[]
+  results      RaceResult[]
+
+  @@index([status, isPrivate])
+  @@index([code])
+}
+
+model RaceParticipant {
+  id        String   @id @default(uuid())
+  roomId    String
+  room      RaceRoom @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  carId     String   @default("car-cyan")
+  isReady   Boolean  @default(false)
+  joinedAt  DateTime @default(now())
+
+  @@unique([roomId, userId])
+}
+
+model RaceResult {
+  id           String   @id @default(uuid())
+  roomId       String
+  room         RaceRoom @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  userId       String
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  rank         Int
+  wpm          Float
+  rawWpm       Float
+  accuracy     Float
+  errorCount   Int      @default(0)
+  finishTimeMs Int
+  createdAt    DateTime @default(now())
+
+  @@unique([roomId, userId])
+  @@index([userId])
+  @@index([wpm(sort: Desc)])
+  @@index([createdAt(sort: Desc)])
+}
